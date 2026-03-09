@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur Multi-Réseau</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; background: #eef2f3; }
+        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; margin-bottom: 20px; }
+        .section { border-left: 4px solid #007bff; padding-left: 15px; margin-bottom: 20px; background: #f9f9f9; padding: 10px; border-radius: 5px; }
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; color: #555; }
+        input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { width: 100%; background: #25D366; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; border-radius: 8px; }
+        #result { display: none; margin-top: 20px; padding: 15px; background: #f0fff4; border: 1px solid #25D366; border-radius: 10px; text-align: center; }
+        .wa-link { display: inline-block; background: #075E54; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🚀 Dashboard Multi-Réseau</h2>
+    
+    <label>📞 WhatsApp du Client</label>
+    <input type="number" id="numClient" placeholder="Ex: 22890000000">
+
+    <label>💰 Montant souhaité (FCFA)</label>
+    <input type="number" id="montant" placeholder="Ex: 5000">
+
+    <div class="section">
+        <label>🔵 Numéro Réception MOOV (Mixx)</label>
+        <input type="number" id="numMixx" placeholder="Ex: 99001122">
+    </div>
+
+    <div class="section" style="border-left-color: #ffc107;">
+        <label>🟡 Numéro Réception MOOV (Flooz)</label>
+        <input type="number" id="numFlooz" placeholder="Ex: 90112233">
+    </div>
+
+    <button onclick="genererLien()">Générer le lien WhatsApp</button>
+
+    <div id="result">
+        <p style="color: #2e7d32; font-weight: bold;">Lien Multi-Paiement prêt !</p>
+        <div id="waArea"></div>
+    </div>
+</div>
+
+<script>
+    function genererLien() {
+        const client = document.getElementById('numClient').value.trim();
+        const mt = document.getElementById('montant').value.trim();
+        const nMixx = document.getElementById('numMixx').value.trim();
+        const nFlooz = document.getElementById('numFlooz').value.trim();
+
+        if(!client || !mt || (!nMixx && !nFlooz)) {
+            alert("Veuillez remplir le montant et au moins un numéro de réception.");
+            return;
+        }
+
+        // --- CONFIGURATION ---
+        const pseudoGithub = "jbkomlan"; 
+        const nomProjet = "Paytg"; 
+        
+        // On passe les deux numéros dans l'URL
+        const baseUrl = `https://${pseudoGithub}.github.io/${nomProjet}/payer.html`;
+        const lienPaiement = `${baseUrl}?mt=${mt}&nmixx=${nMixx}&nflooz=${nFlooz}`;
+        
+        const message = `Bonjour, pour votre paiement de ${mt} FCFA, choisissez votre réseau ici : ${lienPaiement}`;
+        const waURL = `https://wa.me/${client}?text=${encodeURIComponent(message)}`;
+
+        document.getElementById('waArea').innerHTML = `<a href="${waURL}" target="_blank" class="wa-link">📲 Envoyer via WhatsApp</a>`;
+        document.getElementById('result').style.display = 'block';
+    }
+</script>
+</body>
+</html>
