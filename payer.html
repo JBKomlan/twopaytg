@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choisir votre mode de paiement</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .payment-card { background: white; padding: 30px 20px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 90%; max-width: 380px; text-align: center; }
+        h2 { color: #333; margin-bottom: 10px; }
+        .amount-box { background: #e7f3ff; padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+        .amount-value { font-size: 30px; font-weight: bold; color: #007bff; }
+        
+        .pay-options { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        .btn-pay { 
+            display: block; padding: 18px; border-radius: 15px; text-decoration: none; 
+            font-weight: bold; font-size: 16px; transition: 0.3s; color: white; text-align: left;
+            position: relative;
+        }
+        .btn-mixx { background: #007bff; box-shadow: 0 4px 12px rgba(0,123,255,0.3); }
+        .btn-flooz { background: #ffc107; color: #333; box-shadow: 0 4px 12px rgba(255,193,7,0.3); }
+        
+        .btn-pay span { display: block; font-size: 12px; font-weight: normal; opacity: 0.9; }
+        .btn-pay::after { content: '➔'; position: absolute; right: 20px; top: 20px; font-size: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="payment-card">
+    <h2>Finaliser le paiement</h2>
+    <div class="amount-box">
+        <div class="amount-value" id="mtDisp">0 FCFA</div>
+        <div style="font-size: 12px; color: #666;">Montant à transférer</div>
+    </div>
+
+    <p style="font-size: 14px; color: #555;">Choisissez votre réseau :</p>
+    
+    <div class="pay-options">
+        <a href="#" id="linkMixx" class="btn-pay btn-mixx" style="display:none;">
+            PAYER VIA MIXX (Yas)
+            <span id="numMixxDisp">Numéro: ...</span>
+        </a>
+
+        <a href="#" id="linkFlooz" class="btn-pay btn-flooz" style="display:none;">
+            PAYER VIA FLOOZ (Moov)
+            <span id="numFloozDisp">Numéro: ...</span>
+        </a>
+    </div>
+
+    <p style="font-size: 11px; color: #999; margin-top: 25px;">
+        Cliquez sur un bouton pour préparer le code USSD.<br>Validez ensuite en appuyant sur "Appeler".
+    </p>
+</div>
+
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const mt = params.get('mt');
+    const nMixx = params.get('nmixx');
+    const nFlooz = params.get('nflooz');
+
+    if(mt) document.getElementById('mtDisp').innerText = mt + " FCFA";
+
+    // Configuration bouton Mixx
+    if(nMixx && nMixx !== "") {
+        const btn = document.getElementById('linkMixx');
+        const ussd = `*145*1*${mt}*${nMixx}*1#`;
+        btn.href = `tel:${ussd.replace(/#/g, '%23')}`;
+        document.getElementById('numMixxDisp').innerText = "Vers: " + nMixx;
+        btn.style.display = "block";
+    }
+
+    // Configuration bouton Flooz
+    if(nFlooz && nFlooz !== "") {
+        const btn = document.getElementById('linkFlooz');
+        const ussd = `*155*1*1*${nFlooz}*${mt}*1#`;
+        btn.href = `tel:${ussd.replace(/#/g, '%23')}`;
+        document.getElementById('numFloozDisp').innerText = "Vers: " + nFlooz;
+        btn.style.display = "block";
+    }
+</script>
+
+</body>
+</html>
