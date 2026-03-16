@@ -112,9 +112,9 @@
         const nomProjet = "twopaytg"; 
         
         const baseUrl = `https://${pseudoGithub}.github.io/${nomProjet}/payer.html`;
-        const lienPaiement = `${baseUrl}?mt=${mt}&nmixx=${nMixx}&nflooz=${nFlooz}&f=${fraisCoche}`;
+        const transferLink = `${baseUrl}?mt=${mt}&nmixx=${nMixx}&nflooz=${nFlooz}&f=${fraisCoche}`;
         
-        const message = `Bonjour, pour votre paiement de ${mt} FCFA, choisissez votre réseau ici : ${lienPaiement}`;
+        const message = `Salut, pour votre transfert de ${mt} FCFA, choisissez votre réseau ici : ${transferLink}`;
         const waURL = `https://wa.me/${client}?text=${encodeURIComponent(message)}`;
 
         document.getElementById('waArea').innerHTML = `<a href="${waURL}" target="_blank" class="wa-link">📲 Envoyer via WhatsApp</a>`;
