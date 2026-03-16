@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur Multi-Réseau KoMo</title>
+    <title>Générateur de Lien de Transfert d'Argent Mobile Multi-Réseau</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; background: #eef2f3; }
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
@@ -39,13 +39,13 @@
     <div class="section">
         <label>🔵 Numéro Réception Mixx (T-Money)</label>
         <input type="number" id="numMixx" placeholder="Ex: 90112233">
-        <div id="errMixx" class="error">Numéro Mixx invalide (8 chiffres commençant par 90, 91, 92, 93, 70, 71).</div>
+        <div id="errMixx" class="error">Numéro Mixx inconnu.</div>
     </div>
 
     <div class="section" style="border-left-color: #ffc107;">
         <label>🟡 Numéro Réception Flooz (Moov)</label>
         <input type="number" id="numFlooz" placeholder="Ex: 98445566">
-        <div id="errFlooz" class="error">Numéro Flooz invalide (8 chiffres commençant par 98, 97, 96, 99, 79).</div>
+        <div id="errFlooz" class="error">Numéro Flooz inconnu.</div>
     </div>
 
     <button onclick="genererLien()">Générer le lien WhatsApp</button>
@@ -79,7 +79,7 @@
 
         document.querySelectorAll('.error').forEach(el => el.style.display = 'none');
 
-        const prefixesMixx = ['90', '91', '92', '93', '70', '71'];
+        const prefixesMixx = ['90', '91', '92', '93', '70', '71', '72'];
         const prefixesFlooz = ['98', '97', '96', '99', '79'];
 
         let isValid = true;
