@@ -84,6 +84,10 @@
     const nFlooz = params.get('nflooz');
     const f = params.get('f'); // Récupère l'état de la case frais
 
+    // Définit le début du code selon le réseau 
+    const startMixx = *145*1;
+    const startFloozNat = *155*1*1;
+    
     // Définit la fin du code selon l'option choisie
     const suffixe = (f === "1") ? "2#" : "1#";
 
@@ -94,7 +98,7 @@
 
     // Configuration Mixx (T-Money)
     if(nMixx && nMixx !== "null") {
-        codeMixx = `*145*1*${mt}*${nMixx}*${suffixe}`;
+        codeMixx = `*${startMixx}*${mt}*${nMixx}*${suffixe}`;
         document.getElementById('linkMixx').href = `tel:${codeMixx.replace(/#/g, '%23')}`;
         document.getElementById('numMixxDisp').innerText = "Vers: " + nMixx;
         document.getElementById('rowMixx').style.display = "flex";
@@ -102,7 +106,7 @@
 
     // Configuration Flooz (Moov)
     if(nFlooz && nFlooz !== "null") {
-        codeFlooz = `*155*1*1*${nFlooz}*${mt}*${suffixe}`;
+        codeFlooz = `${startFloozNat}*${nFlooz}*${nFlooz}*${mt}*${suffixe}`;
         document.getElementById('linkFlooz').href = `tel:${codeFlooz.replace(/#/g, '%23')}`;
         document.getElementById('numFloozDisp').innerText = "Vers: " + nFlooz;
         document.getElementById('rowFlooz').style.display = "flex";
