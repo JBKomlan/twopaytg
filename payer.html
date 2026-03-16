@@ -98,7 +98,7 @@
 
     // Configuration Mixx (T-Money)
     if(nMixx && nMixx !== "null") {
-        codeMixx = `*${startMixx}*${mt}*${nMixx}*${suffixe}`;
+        codeMixx = `${startMixx}*${mt}*${nMixx}*${suffixe}`;
         document.getElementById('linkMixx').href = `tel:${codeMixx.replace(/#/g, '%23')}`;
         document.getElementById('numMixxDisp').innerText = "Vers: " + nMixx;
         document.getElementById('rowMixx').style.display = "flex";
