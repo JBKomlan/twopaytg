@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur Multi-Réseau</title>
+    <title>Générateur Multi-Réseau Pro</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; background: #eef2f3; }
         .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         h2 { text-align: center; color: #333; margin-bottom: 20px; }
-        .section { border-left: 4px solid #007bff; padding-left: 15px; margin-bottom: 20px; background: #f9f9f9; padding: 10px; border-radius: 5px; }
+        .section { border-left: 4px solid #007bff; padding: 10px 15px; margin-bottom: 20px; background: #f9f9f9; border-radius: 5px; }
         label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; color: #555; }
         input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        button { width: 100%; background: #25D366; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; border-radius: 8px; }
+        .frais-container { display: flex; align-items: center; margin-top: 10px; background: #fff3cd; padding: 8px; border-radius: 8px; border: 1px solid #ffeeba; }
+        .frais-container input { width: auto; margin-top: 0; margin-right: 10px; cursor: pointer; }
+        button { width: 100%; background: #25D366; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; border-radius: 8px; transition: 0.3s; }
+        button:hover { background: #128C7E; }
         #result { display: none; margin-top: 20px; padding: 15px; background: #f0fff4; border: 1px solid #25D366; border-radius: 10px; text-align: center; }
         .wa-link { display: inline-block; background: #075E54; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; }
+        .error { color: #dc3545; font-size: 12px; margin-top: 5px; display: none; }
     </style>
 </head>
 <body>
@@ -21,20 +25,27 @@
 <div class="card">
     <h2>🚀 Dashboard Multi-Réseau</h2>
     
-    <label>📞 WhatsApp du Client</label>
+    <label>📞 WhatsApp du Client (Indicatif obligatoire)</label>
     <input type="number" id="numClient" placeholder="Ex: 22890000000">
 
-    <label>💰 Montant souhaité (FCFA)</label>
+    <label>💰 Montant de base (FCFA)</label>
     <input type="number" id="montant" placeholder="Ex: 5000">
+    
+    <div class="frais-container">
+        <input type="checkbox" id="addFrais">
+        <label for="addFrais" style="margin-top:0; cursor:pointer;">Inclure les frais de retrait (+1%)</label>
+    </div>
 
     <div class="section">
-        <label>🔵 Numéro Réception MOOV (Mixx)</label>
-        <input type="number" id="numMixx" placeholder="Ex: 99001122">
+        <label>🔵 Réception Mixx (90, 91, 92, 93, 70, 71)</label>
+        <input type="number" id="numMixx" placeholder="Ex: 90112233">
+        <div id="errMixx" class="error">Numéro Mixx invalide (8 chiffres requis).</div>
     </div>
 
     <div class="section" style="border-left-color: #ffc107;">
-        <label>🟡 Numéro Réception MOOV (Flooz)</label>
-        <input type="number" id="numFlooz" placeholder="Ex: 90112233">
+        <label>🟡 Réception Flooz (98, 97, 96, 99, 79)</label>
+        <input type="number" id="numFlooz" placeholder="Ex: 98445566">
+        <div id="errFlooz" class="error">Numéro Flooz invalide (8 chiffres requis).</div>
     </div>
 
     <button onclick="genererLien()">Générer le lien WhatsApp</button>
@@ -46,26 +57,65 @@
 </div>
 
 <script>
+    // Chargement automatique des anciens numéros au démarrage
+    window.onload = function() {
+        if(localStorage.getItem('savedMixx')) document.getElementById('numMixx').value = localStorage.getItem('savedMixx');
+        if(localStorage.getItem('savedFlooz')) document.getElementById('numFlooz').value = localStorage.getItem('savedFlooz');
+    };
+
+    function validerReseau(numero, prefixes) {
+        if (!numero) return true; // Optionnel
+        const sNum = numero.toString();
+        const correctPrefix = prefixes.some(p => sNum.startsWith(p));
+        return sNum.length === 8 && correctPrefix;
+    }
+
     function genererLien() {
         const client = document.getElementById('numClient').value.trim();
-        const mt = document.getElementById('montant').value.trim();
+        let mt = parseFloat(document.getElementById('montant').value);
         const nMixx = document.getElementById('numMixx').value.trim();
         const nFlooz = document.getElementById('numFlooz').value.trim();
+        const avecFrais = document.getElementById('addFrais').checked;
 
-        if(!client || !mt || (!nMixx && !nFlooz)) {
-            alert("Veuillez remplir le montant et au moins un numéro de réception.");
+        // Reset erreurs
+        document.querySelectorAll('.error').forEach(el => el.style.display = 'none');
+
+        // VALIDATIONS DES RÉSEAUX
+        const prefixesMixx = ['90', '91', '92', '93', '70', '71'];
+        const prefixesFlooz = ['98', '97', '96', '99', '79'];
+
+        let isValid = true;
+        if(nMixx && !validerReseau(nMixx, prefixesMixx)) {
+            document.getElementById('errMixx').style.display = 'block';
+            isValid = false;
+        }
+        if(nFlooz && !validerReseau(nFlooz, prefixesFlooz)) {
+            document.getElementById('errFlooz').style.display = 'block';
+            isValid = false;
+        }
+
+        if(!client || !mt || (!nMixx && !nFlooz) || !isValid) {
+            alert("Veuillez vérifier les informations saisies.");
             return;
+        }
+
+        // SAUVEGARDE LOCALE
+        localStorage.setItem('savedMixx', nMixx);
+        localStorage.setItem('savedFlooz', nFlooz);
+
+        // CALCUL DU MONTANT FINAL (1%)
+        if(avecFrais) {
+            mt = Math.ceil(mt * 1.01); 
         }
 
         // --- CONFIGURATION ---
         const pseudoGithub = "jbkomlan"; 
         const nomProjet = "twopaytg"; 
         
-        // On passe les deux numéros dans l'URL
         const baseUrl = `https://${pseudoGithub}.github.io/${nomProjet}/payer.html`;
         const lienPaiement = `${baseUrl}?mt=${mt}&nmixx=${nMixx}&nflooz=${nFlooz}`;
         
-        const message = `Bonjour, pour votre paiement de ${mt} FCFA, choisissez votre réseau ici : ${lienPaiement}`;
+        const message = `Bonjour, pour votre paiement de ${mt} FCFA (frais inclus), choisissez votre réseau ici : ${lienPaiement}`;
         const waURL = `https://wa.me/${client}?text=${encodeURIComponent(message)}`;
 
         document.getElementById('waArea').innerHTML = `<a href="${waURL}" target="_blank" class="wa-link">📲 Envoyer via WhatsApp</a>`;
