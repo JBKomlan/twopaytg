@@ -12,29 +12,25 @@
         .amount-value { font-size: 30px; font-weight: bold; color: #007bff; }
         
         .pay-options { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-        
-        /* Conteneur pour aligner bouton et icône de copie */
         .pay-row { display: flex; align-items: stretch; gap: 10px; }
 
         .btn-pay { 
             flex-grow: 1; display: block; padding: 18px; border-radius: 15px; text-decoration: none; 
             font-weight: bold; font-size: 16px; transition: 0.3s; color: white; text-align: left;
-            position: relative;
         }
         .btn-mixx { background: #007bff; box-shadow: 0 4px 12px rgba(0,123,255,0.3); }
         .btn-flooz { background: #ffc107; color: #333; box-shadow: 0 4px 12px rgba(255,193,7,0.3); }
         
-        /* Style du bouton Copier */
+        /* Style icône Copier - Caché par défaut */
         .btn-copy {
-            width: 50px; background: #fff; border: 2px solid #ddd; border-radius: 15px;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            transition: 0.2s;
+            display: none; width: 50px; background: #fff; border: 2px solid #007bff; border-radius: 15px;
+            align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;
         }
-        .btn-copy:active { transform: scale(0.9); background: #eee; }
+        .btn-copy:active { transform: scale(0.9); }
 
         .btn-pay span { display: block; font-size: 12px; font-weight: normal; opacity: 0.9; }
-        
-        /* Notification de copie */
+
+        /* Notification Toast */
         #toast {
             visibility: hidden; min-width: 200px; background-color: #333; color: #fff;
             text-align: center; border-radius: 10px; padding: 10px;
@@ -54,36 +50,34 @@
         <div style="font-size: 12px; color: #666;">Montant à transférer</div>
     </div>
 
-    <p style="font-size: 14px; color: #555;">Choisissez votre réseau :</p>
-    
     <div class="pay-options">
         <div id="rowMixx" class="pay-row" style="display:none;">
-            <a href="#" id="linkMixx" class="btn-pay btn-mixx">
-                PAYER VIA MIXX (Yas)
+            <a href="#" id="linkMixx" class="btn-pay btn-mixx" onclick="showCopyBtn('copyMixx')">
+                PAYER VIA MIXX
                 <span id="numMixxDisp">Numéro: ...</span>
             </a>
-            <div class="btn-copy" onclick="copyUssd('mixx')" title="Copier le code">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <div id="copyMixx" class="btn-copy" onclick="copyUssd('mixx')">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             </div>
         </div>
 
         <div id="rowFlooz" class="pay-row" style="display:none;">
-            <a href="#" id="linkFlooz" class="btn-pay btn-flooz">
-                PAYER VIA FLOOZ (Moov)
+            <a href="#" id="linkFlooz" class="btn-pay btn-flooz" onclick="showCopyBtn('copyFlooz')">
+                PAYER VIA FLOOZ
                 <span id="numFloozDisp">Numéro: ...</span>
             </a>
-            <div class="btn-copy" onclick="copyUssd('flooz')" title="Copier le code">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <div id="copyFlooz" class="btn-copy" onclick="copyUssd('flooz')" style="border-color: #ffc107;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffc107" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
             </div>
         </div>
     </div>
 
-    <p style="font-size: 11px; color: #999; margin-top: 25px;">
-        Cliquez sur le bouton pour appeler ou sur l'icône pour copier le code USSD.
+    <p id="hint" style="font-size: 11px; color: #999; margin-top: 25px;">
+        Le code USSD s'affichera sur votre clavier d'appel.
     </p>
 </div>
 
-<div id="toast">Code USSD copié !</div>
+<div id="toast">Code copié !</div>
 
 <script>
     const params = new URLSearchParams(window.location.search);
@@ -97,35 +91,35 @@
     if(mt) document.getElementById('mtDisp').innerText = mt + " FCFA";
 
     // Configuration Mixx
-    if(nMixx && nMixx !== "") {
+    if(nMixx) {
         codeMixx = `*145*1*${mt}*${nMixx}*1#`;
-        const btn = document.getElementById('linkMixx');
-        btn.href = `tel:${codeMixx.replace(/#/g, '%23')}`;
+        document.getElementById('linkMixx').href = `tel:${codeMixx.replace(/#/g, '%23')}`;
         document.getElementById('numMixxDisp').innerText = "Vers: " + nMixx;
         document.getElementById('rowMixx').style.display = "flex";
     }
 
     // Configuration Flooz
-    if(nFlooz && nFlooz !== "") {
+    if(nFlooz) {
         codeFlooz = `*155*1*1*${nFlooz}*${mt}*1#`;
-        const btn = document.getElementById('linkFlooz');
-        btn.href = `tel:${codeFlooz.replace(/#/g, '%23')}`;
+        document.getElementById('linkFlooz').href = `tel:${codeFlooz.replace(/#/g, '%23')}`;
         document.getElementById('numFloozDisp').innerText = "Vers: " + nFlooz;
         document.getElementById('rowFlooz').style.display = "flex";
+    }
+
+    // Affiche le bouton de copie lors du clic sur le paiement
+    function showCopyBtn(id) {
+        document.getElementById(id).style.display = "flex";
+        document.getElementById('hint').innerText = "En cas de souci, utilisez l'icône de copie apparue à droite.";
     }
 
     // Fonction de copie
     function copyUssd(type) {
         const textToCopy = (type === 'mixx') ? codeMixx : codeFlooz;
         navigator.clipboard.writeText(textToCopy).then(() => {
-            showToast();
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
         });
-    }
-
-    function showToast() {
-        const x = document.getElementById("toast");
-        x.className = "show";
-        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
 </script>
 
