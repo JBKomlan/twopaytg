@@ -1,0 +1,99 @@
+{
+  "app": {
+    "name": "TransferLink TG",
+    "version": "1.0.0",
+    "langue": "fr",
+    "pages": {
+      "dashboard": "index.html",
+      "paiement": "payer.html"
+    }
+  },
+
+  "reseaux": [
+    {
+      "id": "mixx",
+      "nom": "Mixx by Yas (ex T-Money)",
+      "operateur": "Togocel",
+      "emoji": "🔵",
+      "couleur": "#007bff",
+      "couleurOmbre": "rgba(0,123,255,0.3)",
+      "prefixes": ["90", "91", "92", "93", "70", "71", "72"],
+      "longueurNumero": 8,
+      "ussd": {
+        "debut": "*145*1",
+        "suffixeSansFrais": "1#",
+        "suffixeAvecFrais": "2#"
+      },
+      "placeholder": "Ex: 90112233",
+      "labelChamp": "Numéro Réception Mixx (T-Money)",
+      "labelBouton": "Transfert Via Mixx by Yas (Ex TMoney)",
+      "erreurValidation": "Numéro Mixx inconnu.",
+      "paramUrl": "nmixx",
+      "localStorageKey": "savedMixx"
+    },
+    {
+      "id": "flooz",
+      "nom": "Flooz (Moov Money)",
+      "operateur": "Moov Africa",
+      "emoji": "🟡",
+      "couleur": "#ffc107",
+      "couleurTexte": "#333",
+      "couleurOmbre": "rgba(255,193,7,0.3)",
+      "prefixes": ["98", "97", "96", "99", "79"],
+      "longueurNumero": 8,
+      "ussd": {
+        "debut": "*155*1*1",
+        "suffixeSansFrais": "1#",
+        "suffixeAvecFrais": "2#",
+        "repetitionNumero": true
+      },
+      "placeholder": "Ex: 98445566",
+      "labelChamp": "Numéro Réception Flooz (Moov)",
+      "labelBouton": "Transfert Via Flooz (Moov Money Flooz)",
+      "erreurValidation": "Numéro Flooz inconnu.",
+      "paramUrl": "nflooz",
+      "localStorageKey": "savedFlooz"
+    }
+  ],
+
+  "frais": {
+    "actif": false,
+    "taux": 0.01,
+    "label": "Partage de frais (+1%)",
+    "paramUrl": "f",
+    "valeurActive": "1",
+    "valeurInactive": "0",
+    "arrondi": "superieur"
+  },
+
+  "whatsapp": {
+    "prefixeInternational": "228",
+    "placeholder": "Ex: 22890000000",
+    "messageTemplate": "Salut, pour votre transfert de {montant} FCFA, choisissez votre réseau ici : {lien}"
+  },
+
+  "monnaie": {
+    "code": "XOF",
+    "symbole": "FCFA",
+    "locale": "fr-TG"
+  },
+
+  "ui": {
+    "dashboard": {
+      "titre": "🚀 Dashboard Multi-Réseau",
+      "labelNumeroClient": "📞 WhatsApp du Client",
+      "labelMontant": "💰 Montant souhaité (FCFA)",
+      "placeholderMontant": "Ex: 5000",
+      "texteBouton": "Générer le lien WhatsApp",
+      "texteSucces": "Lien Multi-Paiement prêt !",
+      "texteEnvoi": "📲 Envoyer via WhatsApp"
+    },
+    "paiement": {
+      "titre": "Finaliser le transfert",
+      "labelMontant": "Montant à transférer",
+      "hintInitial": "Le code USSD s'affichera sur votre clavier d'appel.",
+      "hintApresClick": "En cas de souci, utilisez l'icône de copie apparue à droite.",
+      "toastCopie": "Code USSD copié !"
+    }
+  }
+}
