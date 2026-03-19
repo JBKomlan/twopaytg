@@ -3,122 +3,358 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur de Lien de Transfert d'Argent Mobile Multi-Réseau</title>
+    <title>TransferLink TG — Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; max-width: 500px; margin: 20px auto; padding: 20px; background: #eef2f3; }
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #333; margin-bottom: 20px; }
-        .section { border-left: 4px solid #007bff; padding: 10px 15px; margin-bottom: 20px; background: #f9f9f9; border-radius: 5px; }
-        label { display: block; margin-top: 10px; font-weight: bold; font-size: 14px; color: #555; }
-        input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
-        .frais-container { display: flex; align-items: center; margin-top: 10px; background: #fff3cd; padding: 8px; border-radius: 8px; border: 1px solid #ffeeba; }
-        .frais-container input { width: auto; margin-top: 0; margin-right: 10px; cursor: pointer; }
-        button { width: 100%; background: #25D366; color: white; border: none; padding: 15px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; border-radius: 8px; transition: 0.3s; }
-        button:hover { background: #128C7E; }
-        #result { display: none; margin-top: 20px; padding: 15px; background: #f0fff4; border: 1px solid #25D366; border-radius: 10px; text-align: center; }
-        .wa-link { display: inline-block; background: #075E54; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; }
-        .error { color: #dc3545; font-size: 12px; margin-top: 5px; display: none; }
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text: #e6edf3;
+            --muted: #8b949e;
+            --accent: #58a6ff;
+            --success: #3fb950;
+            --wa: #25D366;
+            --wa-dark: #128C7E;
+            --radius: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 32px 28px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 20px 50px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease both;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .logo {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--accent), #1f6feb);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+        }
+
+        h2 { font-size: 18px; font-weight: 700; color: var(--text); }
+        .subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; }
+
+        .field { margin-bottom: 18px; }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-inner-spin-button { display: none; }
+        input[type="number"]:focus { border-color: var(--accent); }
+        input[type="number"]::placeholder { color: var(--muted); }
+
+        .frais-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 193, 7, 0.08);
+            border: 1px solid rgba(255, 193, 7, 0.2);
+            border-radius: var(--radius);
+            padding: 10px 14px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background 0.2s;
+        }
+        .frais-toggle:hover { background: rgba(255, 193, 7, 0.12); }
+        .frais-toggle input[type="checkbox"] { 
+            width: 16px; height: 16px; cursor: pointer; accent-color: #ffc107;
+        }
+        .frais-toggle span { font-size: 13px; color: #ffc107; font-weight: 600; }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .separator::before, .separator::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+        .separator span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+        .network-block {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            margin-bottom: 14px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .network-block:hover { border-color: rgba(255,255,255,0.15); }
+        .network-block::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+        }
+        .network-block.mixx::before { background: #007bff; }
+        .network-block.flooz::before { background: #ffc107; }
+
+        .network-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--muted);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            margin-left: 4px;
+        }
+        .network-block.mixx .network-label { color: #4d9ef7; }
+        .network-block.flooz .network-label { color: #ffc107; }
+
+        .error {
+            font-size: 11px;
+            color: #f85149;
+            margin-top: 6px;
+            margin-left: 4px;
+            display: none;
+            font-family: 'DM Mono', monospace;
+        }
+
+        .btn-generate {
+            width: 100%;
+            background: var(--wa);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'Sora', sans-serif;
+            cursor: pointer;
+            border-radius: var(--radius);
+            margin-top: 8px;
+            transition: background 0.2s, transform 0.1s;
+            letter-spacing: 0.02em;
+        }
+        .btn-generate:hover { background: var(--wa-dark); }
+        .btn-generate:active { transform: scale(0.98); }
+
+        .result-box {
+            display: none;
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(63, 185, 80, 0.08);
+            border: 1px solid rgba(63, 185, 80, 0.3);
+            border-radius: var(--radius);
+            text-align: center;
+            animation: fadeIn 0.3s ease both;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .result-label {
+            font-size: 12px;
+            color: var(--success);
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .wa-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--wa);
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            border-radius: var(--radius);
+            font-weight: 700;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        .wa-btn:hover { background: var(--wa-dark); }
     </style>
 </head>
 <body>
-
-<div class="card">
-    <h2>🚀 Dashboard Multi-Réseau</h2>
-    
-    <label>📞 WhatsApp du Client</label>
-    <input type="number" id="numClient" placeholder="Ex: 22890000000">
-
-    <label>💰 Montant souhaité (FCFA)</label>
-    <input type="number" id="montant" placeholder="Ex: 5000">
-    
-    <div class="frais-container">
-        <input type="checkbox" id="addFrais">
-        <label for="addFrais" style="margin-top:0; cursor:pointer;">Partage de frais (+1%)</label>
-    </div>
-
-    <div class="section">
-        <label>🔵 Numéro Réception Mixx (T-Money)</label>
-        <input type="number" id="numMixx" placeholder="Ex: 90112233">
-        <div id="errMixx" class="error">Numéro Mixx inconnu.</div>
-    </div>
-
-    <div class="section" style="border-left-color: #ffc107;">
-        <label>🟡 Numéro Réception Flooz (Moov)</label>
-        <input type="number" id="numFlooz" placeholder="Ex: 98445566">
-        <div id="errFlooz" class="error">Numéro Flooz inconnu.</div>
-    </div>
-
-    <button onclick="genererLien()">Générer le lien WhatsApp</button>
-
-    <div id="result">
-        <p style="color: #2e7d32; font-weight: bold;">Lien Multi-Paiement prêt !</p>
-        <div id="waArea"></div>
-    </div>
+<div class="card" id="app">
+    <!-- contenu injecté par JS depuis config.json -->
 </div>
 
 <script>
-    // Chargement des numéros sauvegardés
-    window.onload = function() {
-        if(localStorage.getItem('savedMixx')) document.getElementById('numMixx').value = localStorage.getItem('savedMixx');
-        if(localStorage.getItem('savedFlooz')) document.getElementById('numFlooz').value = localStorage.getItem('savedFlooz');
-    };
+    // ═══════════════════════════════════════════════
+    // CHARGEMENT DE LA CONFIG ET RENDU DE L'UI
+    // ═══════════════════════════════════════════════
+    fetch('config.json')
+        .then(r => r.json())
+        .then(cfg => initApp(cfg));
 
-    function validerReseau(numero, prefixes) {
-        if (!numero) return true;
-        const sNum = numero.toString();
-        const hasPrefix = prefixes.some(p => sNum.startsWith(p));
-        return sNum.length === 8 && hasPrefix;
+    function initApp(cfg) {
+        const app = document.getElementById('app');
+        const dash = cfg.ui.dashboard;
+        const reseaux = cfg.reseaux;
+
+        // Construire les blocs réseau dynamiquement
+        const reseauxHTML = reseaux.map(r => `
+            <div class="network-block ${r.id}">
+                <div class="network-label">${r.emoji} ${r.labelChamp}</div>
+                <input type="number" id="num_${r.id}" placeholder="${r.placeholder}">
+                <div id="err_${r.id}" class="error">⚠ ${r.erreurValidation}</div>
+            </div>
+        `).join('');
+
+        app.innerHTML = `
+            <div class="header">
+                <div class="logo">🚀</div>
+                <div>
+                    <h2>${cfg.app.name}</h2>
+                    <div class="subtitle">Dashboard Agent</div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>${dash.labelNumeroClient}</label>
+                <input type="number" id="numClient" placeholder="${cfg.whatsapp.placeholder}">
+            </div>
+
+            <div class="field">
+                <label>${dash.labelMontant}</label>
+                <input type="number" id="montant" placeholder="${dash.placeholderMontant}">
+            </div>
+
+            <label class="frais-toggle">
+                <input type="checkbox" id="addFrais">
+                <span>💸 ${cfg.frais.label}</span>
+            </label>
+
+            <div class="separator"><span>Réseaux de réception</span></div>
+
+            ${reseauxHTML}
+
+            <button class="btn-generate" onclick="genererLien()">
+                ${dash.texteBouton}
+            </button>
+
+            <div class="result-box" id="result">
+                <div class="result-label">✓ ${dash.texteSucces}</div>
+                <div id="waArea"></div>
+            </div>
+        `;
+
+        // Restaurer les numéros sauvegardés
+        reseaux.forEach(r => {
+            const saved = localStorage.getItem(r.localStorageKey);
+            if (saved) document.getElementById(`num_${r.id}`).value = saved;
+        });
+
+        // Attacher la logique de génération avec accès à la config
+        window.genererLien = function() {
+            const client = document.getElementById('numClient').value.trim();
+            let mt = parseFloat(document.getElementById('montant').value);
+            const avecFrais = document.getElementById('addFrais').checked;
+
+            // Reset erreurs
+            reseaux.forEach(r => {
+                document.getElementById(`err_${r.id}`).style.display = 'none';
+            });
+
+            // Validation réseau par réseau
+            let isValid = true;
+            const valeurs = {};
+            reseaux.forEach(r => {
+                const val = document.getElementById(`num_${r.id}`).value.trim();
+                valeurs[r.id] = val;
+                if (val && !validerReseau(val, r.prefixes, r.longueurNumero)) {
+                    document.getElementById(`err_${r.id}`).style.display = 'block';
+                    isValid = false;
+                }
+            });
+
+            const auMoinsUnReseau = reseaux.some(r => valeurs[r.id]);
+            if (!client || !mt || !auMoinsUnReseau || !isValid) {
+                alert("Veuillez remplir correctement les champs.");
+                return;
+            }
+
+            // Sauvegarder les numéros
+            reseaux.forEach(r => {
+                localStorage.setItem(r.localStorageKey, valeurs[r.id]);
+            });
+
+            // Calcul frais
+            const fraisParam = avecFrais ? cfg.frais.valeurActive : cfg.frais.valeurInactive;
+            if (avecFrais) mt = Math.ceil(mt * (1 + cfg.frais.taux));
+
+            // Construction URL
+            const params = new URLSearchParams({ mt, f: fraisParam });
+            reseaux.forEach(r => {
+                if (valeurs[r.id]) params.set(r.paramUrl, valeurs[r.id]);
+            });
+            const transferLink = `${cfg.app.pages.paiement}?${params.toString()}`;
+
+            const message = cfg.whatsapp.messageTemplate
+                .replace('{montant}', mt)
+                .replace('{lien}', transferLink);
+            const waURL = `https://wa.me/${client}?text=${encodeURIComponent(message)}`;
+
+            document.getElementById('waArea').innerHTML =
+                `<a href="${waURL}" target="_blank" class="wa-btn">📲 ${dash.texteEnvoi}</a>`;
+            document.getElementById('result').style.display = 'block';
+        };
     }
 
-    function genererLien() {
-        const client = document.getElementById('numClient').value.trim();
-        let mt = parseFloat(document.getElementById('montant').value);
-        const nMixx = document.getElementById('numMixx').value.trim();
-        const nFlooz = document.getElementById('numFlooz').value.trim();
-        const avecFrais = document.getElementById('addFrais').checked;
-
-        document.querySelectorAll('.error').forEach(el => el.style.display = 'none');
-
-        const prefixesMixx = ['90', '91', '92', '93', '70', '71', '72'];
-        const prefixesFlooz = ['98', '97', '96', '99', '79'];
-
-        let isValid = true;
-        if(nMixx && !validerReseau(nMixx, prefixesMixx)) {
-            document.getElementById('errMixx').style.display = 'block';
-            isValid = false;
-        }
-        if(nFlooz && !validerReseau(nFlooz, prefixesFlooz)) {
-            document.getElementById('errFlooz').style.display = 'block';
-            isValid = false;
-        }
-
-        if(!client || !mt || (!nMixx && !nFlooz) || !isValid) {
-            alert("Veuillez remplir correctement les champs.");
-            return;
-        }
-
-        // Sauvegarde des numéros de réception
-        localStorage.setItem('savedMixx', nMixx);
-        localStorage.setItem('savedFlooz', nFlooz);
-
-        // --- GESTION DES FRAIS ET DU SUFFIXE ---
-        const fraisCoche = avecFrais ? "1" : "0";
-        if(avecFrais) {
-            mt = Math.ceil(mt * 1.01); 
-        }
-
-        // --- CONFIGURATION ---
-        const pseudoGithub = "jbkomlan"; 
-        const nomProjet = "transferlink.tg"; 
-        
-        const baseUrl = "payer.html";
-        const transferLink = `${baseUrl}?mt=${mt}&nmixx=${nMixx}&nflooz=${nFlooz}&f=${fraisCoche}`;
-        
-        const message = `Salut, pour votre transfert de ${mt} FCFA, choisissez votre réseau ici : ${transferLink}`;
-        const waURL = `https://wa.me/${client}?text=${encodeURIComponent(message)}`;
-
-        document.getElementById('waArea').innerHTML = `<a href="${waURL}" target="_blank" class="wa-link">📲 Envoyer via WhatsApp</a>`;
-        document.getElementById('result').style.display = 'block';
+    function validerReseau(numero, prefixes, longueur) {
+        const s = numero.toString();
+        return s.length === longueur && prefixes.some(p => s.startsWith(p));
     }
 </script>
 </body>
