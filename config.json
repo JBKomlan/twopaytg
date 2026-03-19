@@ -5,7 +5,7 @@
     "langue": "fr",
     "pages": {
       "dashboard": "index.html",
-      "paiement": "https://transferlink-tg.vercel.app/payer.html"
+      "paiement": "https://transferlink-tg.vercel.app/transfer.html"
     }
   },
 
