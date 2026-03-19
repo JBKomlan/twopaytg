@@ -343,7 +343,7 @@
 
             const message = cfg.whatsapp.messageTemplate
                 .replace('{montant}', mt)
-                .replace('{lien}', transferLink);
+                .replace('{lien}', payer.html);
             const waURL = `https://wa.me/${client}?text=${encodeURIComponent(message)}`;
 
             document.getElementById('waArea').innerHTML =
