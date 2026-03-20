@@ -85,7 +85,7 @@
       "labelMontant": "💰 Montant souhaité (FCFA)",
       "placeholderMontant": "Ex: 5000",
       "texteBouton": "Générer le lien WhatsApp",
-      "texteSucces": "Lien Multi-Paiement prêt !",
+      "texteSucces": "Lien Multi-Transfert prêt !",
       "texteEnvoi": "📲 Envoyer via WhatsApp"
     },
     "paiement": {
